@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>JTechLog RESTful webszolgáltatások Jersey-vel</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+
+</head>
+<body>
+
+<div id="content">
+    <dl>
+
+    </dl>
+</div>
+
+<div id="form">
+    <form action="/">
+        <p>
+            <label for="urlInput">URL</label>
+            <input type="text" id="urlInput"/>
+            <label for="titleInput">Title</label>
+            <input type="text" id="titleInput"/>
+            <input id="createButton" type="submit" value="Create"/>
+        </p>
+    </form>
+</div>
+
+<script type="text/javascript">
+    function printBookmarks(bookmarks) {
+        $("#content").find("dl").html("");
+        $.each(bookmarks, function (index, value) {
+            $("#content").find("dl")
+                    .append("<dt>" + value.url + "</dt>")
+                    .append("<dd>" + value.title + "</dd>");
+        });
+    }
+
+    function loadBookmarks() {
+        $.ajax({
+            url: "resources/bookmarks",
+            contentType: 'application/json',
+            dataType: "json",
+            success: function (data) {
+                printBookmarks(data);
+                $("#urlInput").focus();
+            }
+        });
+    }
+
+    function createBookmark() {
+        var bookmark = buildBookmark();
+
+        $.ajax({
+            type: "POST",
+            url: "resources/bookmarks",
+            contentType: 'application/json',
+            data: JSON.stringify(bookmark),
+            dataType: "json",
+            success: function (data) {
+                $("form").find("input[type = 'text']").val("");
+                loadBookmarks();
+            }
+        });
+
+        return false;
+    }
+
+    function buildBookmark() {
+        return {url: $("#urlInput").val(), title: $("#titleInput").val()};
+    }
+
+    $(function () {
+        $("#createButton").click(createBookmark);
+        loadBookmarks();
+    });
+</script>
+
+</body>
+</html>
